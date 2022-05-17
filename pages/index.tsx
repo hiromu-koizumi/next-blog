@@ -6,15 +6,17 @@ import Layout from '../components/layout'
 import { getAllPosts } from '../lib/api'
 import Head from 'next/head'
 import { CMS_NAME } from '../lib/constants'
-import Post from '../types/post'
+import Blog from '../types/blog'
+import { client } from "../lib/client";
 
 type Props = {
-  allPosts: Post[]
+  blogs: Blog[]
 }
 
-const Index = ({ allPosts }: Props) => {
-  const heroPost = allPosts[0]
-  const morePosts = allPosts.slice(1)
+const Index = ({ blogs }: Props) => {
+  const heroPost = blogs[0]
+  const morePosts = blogs.slice(1)
+  console.log(blogs)
   return (
     <>
       <Layout>
@@ -26,8 +28,8 @@ const Index = ({ allPosts }: Props) => {
           {heroPost && (
             <HeroPost
               title={heroPost.title}
-              coverImage={heroPost.coverImage}
-              date={heroPost.date}
+              coverImage={heroPost.eyecatch.url}
+              date={heroPost.updatedAt}
               author={heroPost.author}
               slug={heroPost.slug}
               excerpt={heroPost.excerpt}
@@ -43,16 +45,30 @@ const Index = ({ allPosts }: Props) => {
 export default Index
 
 export const getStaticProps = async () => {
-  const allPosts = getAllPosts([
-    'title',
-    'date',
-    'slug',
-    'author',
-    'coverImage',
-    'excerpt',
-  ])
+  const data = await client.get({ endpoint: "blogs" });
+  console.log(data.contents, 'data')
+  const blogs: Blog[] = data.contents.map((val: any) => {
+    return {
+      title: val.title,
+      content: val.content,
+      updatedAt: val.updatedAt,
+      eyecatch: {
+        url: val.eyecatch.url,
+        height: val.eyecatch.height,
+        width: val.eyecatch.width
+      },
+      slug: val.slug,
+      excerpt: val.excerpt,
+      author: {
+        name: val.authorName,
+        picture: val.authorPicture
+      }
 
+    }
+  })
   return {
-    props: { allPosts },
-  }
+    props: {
+      blogs,
+    },
+  };
 }
