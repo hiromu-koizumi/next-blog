@@ -1,33 +1,53 @@
-import Container from '../components/container'
 import MoreStories from '../components/more-stories'
-import HeroPost from '../components/hero-post'
-import Intro from '../components/intro'
 import Layout from '../components/layout'
-import { getAllPosts } from '../lib/api'
+import { getBlogs } from '../lib/api'
 import Head from 'next/head'
-import { CMS_NAME } from '../lib/constants'
 import Blog from '../types/blog'
-import { client } from "../lib/client";
+import { useEffect, useState } from 'react'
 
 type Props = {
-  blogs: Blog[]
+  initBlogs: Blog[]
 }
 
-const Index = ({ blogs }: Props) => {
-  // const heroPost = blogs[0]
-  // const morePosts = blogs.slice(1)
-  console.log(blogs)
+const Index = ({ initBlogs }: Props) => {
+  const [blogs, setBlogs] = useState<Blog[]>([])
+  const [offset, setOffset] = useState<number>(0)
+
+  useEffect(() => {
+    setBlogs(initBlogs)
+  }, [])
+
+  useEffect(() => {
+    const set = async () => {
+      const newBlogs = await getBlogs({ offset })
+      setBlogs([...blogs, ...newBlogs])
+    }
+    set()
+  }, [offset])
+
+  const handleClickLoadBlogs = async () => {
+    setOffset(offset + 10)
+  }
+
   return (
     <>
       <Layout>
         <Head>
-          <title>Next.js Blog Example with {CMS_NAME}</title>
+          <title>CryptoClips</title>
         </Head>
         <div className="bg-white">
           <div className="max-w-2xl mx-auto py-6 px-4 sm:py-6 sm:px-6 lg:max-w-7xl lg:px-8">
             <h2 className="text-2xl font-extrabold tracking-tight text-gray-900">CryptoClips</h2>
-
             <MoreStories posts={blogs} />
+            <div className='justify-center flex mt-9'>
+              <button
+                type="button"
+                className="inline-flex items-center px-10 py-2 border border-gray-300 rounded-md text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
+                onClick={handleClickLoadBlogs}
+              >
+                More
+              </button>
+            </div>
           </div>
         </div>
       </Layout>
@@ -38,31 +58,10 @@ const Index = ({ blogs }: Props) => {
 export default Index
 
 export const getStaticProps = async () => {
-  const data = await client.get({ endpoint: "blogs" });
-  console.log(data.contents, 'data')
-  const blogs: Blog[] = data.contents.map((val: any) => {
-    return {
-      id: val.id,
-      title: val.title,
-      content: val.content,
-      updatedAt: val.updatedAt,
-      eyecatch: {
-        url: val.eyecatch.url,
-        height: val.eyecatch.height,
-        width: val.eyecatch.width
-      },
-      slug: val.slug,
-      excerpt: val.excerpt,
-      author: {
-        name: val.authorName,
-        picture: val.authorPicture
-      },
-      tags: val.tags
-    }
-  })
+  const initBlogs = await getBlogs()
   return {
     props: {
-      blogs,
+      initBlogs,
     },
   };
 }

@@ -1,47 +1,35 @@
-import fs from 'fs'
-import { join } from 'path'
-import matter from 'gray-matter'
+import { client } from "./client";
+import Blog from '../types/blog'
 
-const postsDirectory = join(process.cwd(), '_posts')
-
-export function getPostSlugs() {
-  return fs.readdirSync(postsDirectory)
+export type GetBlogsQueries = {
+  offset: number
 }
 
-export function getPostBySlug(slug: string, fields: string[] = []) {
-  const realSlug = slug.replace(/\.md$/, '')
-  const fullPath = join(postsDirectory, `${realSlug}.md`)
-  const fileContents = fs.readFileSync(fullPath, 'utf8')
-  const { data, content } = matter(fileContents)
-
-  type Items = {
-    [key: string]: string
-  }
-
-  const items: Items = {}
-
-  // Ensure only the minimal needed data is exposed
-  fields.forEach((field) => {
-    if (field === 'slug') {
-      items[field] = realSlug
-    }
-    if (field === 'content') {
-      items[field] = content
-    }
-
-    if (typeof data[field] !== 'undefined') {
-      items[field] = data[field]
+export const getBlogs = async (queries?: GetBlogsQueries) => {
+  const data = await client.get({
+    endpoint: "blogs",
+    queries
+  });
+  console.log(queries)
+  const initBlogs: Blog[] = data.contents.map((val: any) => {
+    return {
+      id: val.id,
+      title: val.title,
+      content: val.content,
+      updatedAt: val.updatedAt,
+      eyecatch: {
+        url: val.eyecatch.url,
+        height: val.eyecatch.height,
+        width: val.eyecatch.width
+      },
+      slug: val.slug,
+      excerpt: val.excerpt,
+      author: {
+        name: val.authorName,
+        picture: val.authorPicture
+      },
+      tags: val.tags
     }
   })
-
-  return items
-}
-
-export function getAllPosts(fields: string[] = []) {
-  const slugs = getPostSlugs()
-  const posts = slugs
-    .map((slug) => getPostBySlug(slug, fields))
-    // sort posts by date in descending order
-    .sort((post1, post2) => (post1.date > post2.date ? -1 : 1))
-  return posts
+  return initBlogs
 }
