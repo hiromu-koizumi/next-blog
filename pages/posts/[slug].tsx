@@ -103,7 +103,7 @@
 // import { Text, Heading, Box } from '@chakra-ui/react'
 import { client } from "../../lib/client";
 
-export default function BlogId({ blog }) {
+export default function BlogId({ blog }: any) {
 
   return (
     <main>
@@ -123,12 +123,12 @@ export default function BlogId({ blog }) {
 export const getStaticPaths = async () => {
   const data = await client.get({ endpoint: "blogs" });
 
-  const paths = data.contents.map((content) => `/posts/${content.slug}`);
+  const paths = data.contents.map((content: any) => `/posts/${content.slug}`);
   return { paths, fallback: false };
 };
 
 // データをテンプレートに受け渡す部分の処理を記述します
-export const getStaticProps = async (context) => {
+export const getStaticProps = async (context: any) => {
   const id = context.params.id;
   const data = await client.get({ endpoint: "blogs", contentId: id });
   return {
