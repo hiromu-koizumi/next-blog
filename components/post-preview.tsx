@@ -11,6 +11,8 @@ type Props = {
   excerpt: string
   author: Author
   slug: string
+  tags: string[]
+  id: string
 }
 
 const PostPreview = ({
@@ -20,22 +22,27 @@ const PostPreview = ({
   excerpt,
   author,
   slug,
+  tags,
+  id
 }: Props) => {
   return (
-    <div>
-      <div className="mb-5">
+    <div key={id} className="group relative">
+      <div className="w-full min-h-80 bg-gray-200 aspect-w-1 aspect-h-1 rounded-md overflow-hidden group-hover:opacity-75 lg:aspect-none">
         <CoverImage slug={slug} title={title} src={coverImage} />
       </div>
-      <h3 className="text-3xl mb-3 leading-snug">
-        <Link as={`/posts/${slug}`} href="/posts/[slug]">
-          <a className="hover:underline">{title}</a>
-        </Link>
-      </h3>
-      <div className="text-lg mb-4">
-        <DateFormatter dateString={date} />
+      <div className="mt-4 flex justify-between">
+        <div>
+          <h3 className="text-lg text-gray-700">
+            <a href={`/posts/${slug}`}>
+              <span aria-hidden="true" className="absolute inset-0" />
+              {title}
+            </a>
+          </h3>
+          {
+            tags?.map(tag => <p className="mt-1 text-sm text-gray-500 bg-slate-100 w-max p-1 rounded">{tag}</p>)
+          }
+        </div>
       </div>
-      <p className="text-lg leading-relaxed mb-4">{excerpt}</p>
-      <Avatar name={author.name} picture={author.picture} />
     </div>
   )
 }

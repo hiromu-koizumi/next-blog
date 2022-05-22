@@ -1,6 +1,7 @@
 import Author from './author'
 
 type BlogType = {
+  id: string
   title: string
   content: string
   updatedAt: string
@@ -11,7 +12,8 @@ type BlogType = {
   }
   slug: string,
   excerpt: string,
-  author: Author
+  author: Author,
+  tags: string[]
 }
 
 export default BlogType

@@ -14,8 +14,8 @@ type Props = {
 }
 
 const Index = ({ blogs }: Props) => {
-  const heroPost = blogs[0]
-  const morePosts = blogs.slice(1)
+  // const heroPost = blogs[0]
+  // const morePosts = blogs.slice(1)
   console.log(blogs)
   return (
     <>
@@ -23,20 +23,13 @@ const Index = ({ blogs }: Props) => {
         <Head>
           <title>Next.js Blog Example with {CMS_NAME}</title>
         </Head>
-        <Container>
-          <Intro />
-          {heroPost && (
-            <HeroPost
-              title={heroPost.title}
-              coverImage={heroPost.eyecatch.url}
-              date={heroPost.updatedAt}
-              author={heroPost.author}
-              slug={heroPost.slug}
-              excerpt={heroPost.excerpt}
-            />
-          )}
-          {morePosts.length > 0 && <MoreStories posts={morePosts} />}
-        </Container>
+        <div className="bg-white">
+          <div className="max-w-2xl mx-auto py-6 px-4 sm:py-6 sm:px-6 lg:max-w-7xl lg:px-8">
+            <h2 className="text-2xl font-extrabold tracking-tight text-gray-900">CryptoClips</h2>
+
+            <MoreStories posts={blogs} />
+          </div>
+        </div>
       </Layout>
     </>
   )
@@ -49,6 +42,7 @@ export const getStaticProps = async () => {
   console.log(data.contents, 'data')
   const blogs: Blog[] = data.contents.map((val: any) => {
     return {
+      id: val.id,
       title: val.title,
       content: val.content,
       updatedAt: val.updatedAt,
@@ -62,8 +56,8 @@ export const getStaticProps = async () => {
       author: {
         name: val.authorName,
         picture: val.authorPicture
-      }
-
+      },
+      tags: val.tags
     }
   })
   return {
