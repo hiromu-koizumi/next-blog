@@ -3,6 +3,7 @@ import Blog from '../types/blog'
 
 export type GetBlogsQueries = {
   offset: number
+  filters?: string
 }
 
 export const getBlogs = async (queries?: GetBlogsQueries) => {

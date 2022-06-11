@@ -1,121 +1,37 @@
-// import { useRouter } from 'next/router'
-// import ErrorPage from 'next/error'
-// import Container from '../../components/container'
-// import PostBody from '../../components/post-body'
-// import Header from '../../components/header'
-// import PostHeader from '../../components/post-header'
-// import Layout from '../../components/layout'
-// import { getPostBySlug, getAllPosts } from '../../lib/api'
-// import PostTitle from '../../components/post-title'
-// import Head from 'next/head'
-// import { CMS_NAME } from '../../lib/constants'
-// import markdownToHtml from '../../lib/markdownToHtml'
-// import PostType from '../../types/blog'
+import dayjs from "dayjs";
+import { useEffect } from "react";
 
-// type Props = {
-//   post: PostType
-//   morePosts: PostType[]
-//   preview?: boolean
-// }
-
-// const Post = ({ post, morePosts, preview }: Props) => {
-//   const router = useRouter()
-//   console.log(post, 'pooooss')
-//   // if (!router.isFallback && !post?.slug) {
-//   //   return <ErrorPage statusCode={404} />
-//   // }
-//   return (
-//     <Layout preview={preview}>
-//       <Container>
-//         <Header />
-//         {router.isFallback ? (
-//           <PostTitle>Loading…</PostTitle>
-//         ) : (
-//           <>
-//             <article className="mb-32">
-//               <Head>
-//                 <title>
-//                   {post.title} | Next.js Blog Example with {CMS_NAME}
-//                 </title>
-//                 <meta property="og:image" content={post.eyecatch.url} />
-//               </Head>
-//               <PostHeader
-//                 title={post.title}
-//                 coverImage={post.eyecatch.url}
-//                 date={post.updatedAt}
-//                 author={post.author}
-//               />
-//               <PostBody content={post.content} />
-//             </article>
-//           </>
-//         )}
-//       </Container>
-//     </Layout>
-//   )
-// }
-
-// export default Post
-
-// type Params = {
-//   params: {
-//     slug: string
-//   }
-// }
-
-// export async function getStaticProps({ params }: Params) {
-//   console.log('udfio')
-//   const post = getPostBySlug(params.slug, [
-//     'title',
-//     'date',
-//     'slug',
-//     'author',
-//     'content',
-//     'ogImage',
-//     'coverImage',
-//   ])
-//   const content = await markdownToHtml(post.content || '')
-//   console.log(content, 'content')
-//   console.log(post, 'ps')
-//   return {
-//     props: {
-//       post: {
-//         ...post,
-//         content,
-//       },
-//     },
-//   }
-// }
-
-// export async function getStaticPaths() {
-//   const posts = getAllPosts(['slug'])
-
-//   return {
-//     paths: posts.map((post) => {
-//       return {
-//         params: {
-//           slug: post.slug,
-//         },
-//       }
-//     }),
-//     fallback: false,
-//   }
-// }
-// import { Text, Heading, Box } from '@chakra-ui/react'
+import Layout from "../../components/layout";
+import { Tags } from "../../components/tags";
 import { client } from "../../lib/client";
 
-export default function BlogId({ blog }: any) {
+export default function BlogDetail({ blog }: any) {
 
   return (
-    <main>
-      <h1 className='text-2xl md:text-3xl font-bold p-4'>{blog.title}</h1>
-      {/* <p className='pl-4'>{blog.updatedAt}</p> */}
-      <div
-        className='p-4'
-        dangerouslySetInnerHTML={{
-          __html: `${blog.content}`,
-        }}
-      />
-    </main>
+    <Layout>
+      <div>
+        <div className="container w-full md:max-w-3xl mx-auto pt-20">
+
+          <div className="w-full px-4 md:px-6 text-xl text-gray-800 leading-normal">
+            <h1 className='text-2xl md:text-3xl font-bold'>{blog.title}</h1>
+            <p className='pt-4'>{dayjs(blog.updatedAt).format('YYYY-MM-DD')}</p>
+            {/* タグ */}
+            <Tags tags={blog.tags} />
+
+            <div
+              className='pt-6'
+              dangerouslySetInnerHTML={{
+                __html: `${blog.content}`,
+              }}
+            />
+          </div>
+
+
+
+        </div>
+        {/* tag blogs */}
+      </div>
+    </Layout>
   );
 }
 
